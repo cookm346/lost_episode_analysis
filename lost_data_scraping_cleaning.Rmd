@@ -1,0 +1,96 @@
+---
+title: ''
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rvest)
+library(tidyverse)
+library(lubridate)
+
+#scrape wikipedia episodes tables for each of six seasons
+wiki_content <- read_html("https://en.wikipedia.org/wiki/List_of_Lost_episodes")
+tables <- wiki_content %>% html_table()
+
+#merge and tidy episodes table
+wiki_tables <- map_df(2:7, ~tables[[.x]] %>% mutate(`No. inseason` := str_remove_all(`No. inseason`, "\\[[0-9]+\\]"))) %>%
+    rename(episode = `No. inseason`,
+           title = Title,
+           director = `Directed by`,
+           writer = `Written by`,
+           feature_character = "Featured character(s)",
+           date = "Original air date",
+           viewers = `U.S. viewers(millions)`) %>%
+    mutate(episode = parse_number(episode)) %>%
+    mutate(episode = case_when(
+      No.overall == 2425 ~ 24,
+      No.overall == 4849 ~ 23,
+      No.overall == 7172 ~ 22,
+      No.overall == 8586 ~ 13,
+      No.overall == 102103 ~ 16,
+      No.overall == 104105 ~ 1,
+      No.overall == 120121 ~ 17,
+      TRUE ~ episode
+    )) %>%
+    mutate(title = str_remove_all(title, '\\"')) %>%
+    mutate(writer = if_else(No.overall %in% c(1, 2), "Jeffrey Lieber & J. J. Abrams & Damon Lindelof", writer),
+           writer = if_else(No.overall == 22, "Javier Grillo-Marxuach & Edward Kitsis & Adam Horowitz", writer),
+           writer = if_else(No.overall == 50, "Damon Lindelof & J. J. Abrams", writer)) %>%
+    mutate(feature_character = str_replace_all(feature_character, ",", " & "),
+           feature_character = str_replace_all(feature_character, " and ", " & "),
+           feature_character = str_squish(feature_character)) %>%
+    mutate(date = str_extract(date, "\\([0-9-]+\\)"),
+           date = str_remove_all(date, "[\\(\\)]"),
+           date = as_date(date)) %>%
+    mutate(viewers = str_remove_all(viewers, "\\[[0-9]+\\]"),
+           viewers = parse_number(viewers)) %>%
+    mutate(season = cumsum(str_detect(episode, "^1$"))) %>%
+    select(-No.overall) %>%
+    relocate(all_of(c("season", "episode")), .after = "title")
+
+#load episodes ratings scraped from https://www.ratingraph.com/tv-shows/lost-ratings-18880/
+ratings <- read_csv("data/imdb_ratings.csv")
+
+ratings <- ratings %>%
+    select(-title, -year)
+
+#join episode data with imdb ratings
+lost_data <- wiki_tables %>%
+    left_join(ratings)
+
+#function to get wikipedia page text given episode page
+extract_page_content <- function(page){
+    read_html(page) %>% 
+    html_nodes("p") %>% 
+    html_text() %>%
+    paste(collapse = " ")
+}
+
+#scrape each episode text from wikipedia
+wiki_text <- wiki_content %>% 
+    html_nodes(".summary a") %>% 
+    html_attr("href") %>%
+    as_tibble() %>%
+    slice_head(n = nrow(lost_data)) %>%
+    rename(url = value) %>%
+    mutate(url = paste0("https://en.wikipedia.org", url)) %>%
+    mutate(content = map(url, extract_page_content)) %>%
+    mutate(content = str_squish(content))
+
+#join wikipedia episode text data to episode information and imdb ratings
+lost_data <- lost_data %>%
+    bind_cols(wiki_text) %>%
+    relocate(all_of(c("url", "content")), .after = viewers)
+
+#write data to csv
+write_csv(lost_data, "data/lost_data.csv")
+
+
+```
+

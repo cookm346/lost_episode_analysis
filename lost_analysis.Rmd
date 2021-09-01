@@ -1,0 +1,328 @@
+---
+title: ''
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, fig.width = 10, fig.height = 8)
+```
+
+### LOST episode analysis and IMDb rating prediction
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+```{r}
+lost <- read_csv("data/lost_data.csv")
+```
+
+<br />
+
+### LOST episode ratings
+
+```{r}
+lost %>%
+    ggplot(aes(avg_rating)) +
+    geom_histogram() +
+    labs(x = "IMDb rating",
+         y = NULL,
+         title = "LOST episodes ranked by IMDb rating")
+```
+
+```{r}
+lost %>%
+    mutate(title = fct_reorder(title, avg_rating)) %>%
+    ggplot(aes(avg_rating, title)) +
+    geom_point() +
+    labs(x = "IMDb rating",
+         y = NULL,
+         title = "LOST episodes ranked by IMDb rating") +
+    theme(axis.text.y = element_text(size = 8))
+```
+
+<br />
+
+### Episode ratings by season
+
+```{r}
+lost %>%
+    mutate(episode_number = row_number()) %>%
+    ggplot(aes(episode_number, avg_rating, color = factor(season))) +
+    geom_point(size = 3) +
+    geom_smooth(size = 1.5) +
+    geom_smooth(aes(group = 1), size = 1.5) +
+    labs(x = "Episode",
+         y = "IMDb rating", 
+         color = "Season",
+         title = "Most seasons of LOST end on a high note") +
+    scale_x_continuous(n.breaks = 10)
+```
+
+<br />
+
+### Which feature chraracter(s) have the best LOST episodes?
+
+```{r}
+lost %>%
+    group_by(feature_character) %>%
+    summarize(avg_rating = mean(avg_rating),
+              n = n()) %>%
+    mutate(feature_character = fct_reorder(feature_character, avg_rating)) %>%
+    ggplot(aes(avg_rating, feature_character, size = n)) +
+    geom_point() +
+    labs(x = "IMDb rating",
+         y = "Feature character", 
+         size = "Number of episodes",
+         title = "Richard and Jacob have the highest rated episodes, romantic couples the lowest",
+         subtitle = "Point size displays number of episodes for feature characters")
+```
+
+<br />
+
+### Which directors make the best LOST episodes?
+
+```{r}
+lost %>%
+    group_by(director) %>%
+    summarize(avg_rating = mean(avg_rating),
+              n = n()) %>%
+    mutate(director = fct_reorder(director, avg_rating)) %>%
+    ggplot(aes(avg_rating, director, size = n)) +
+    geom_point() +
+    labs(x = "IMDb rating",
+         y = "Director", 
+         size = "Number of episodes",
+         title = "J.J. Abrams directed the best LOST episode",
+         subtitle = "Point size displays number of episodes for feature characters")
+```
+
+<br />
+
+### Which writers make the best LOST episodes?
+
+```{r}
+lost %>%
+    separate_rows(writer, sep = " & ") %>% 
+    group_by(writer) %>%
+    summarize(avg_rating = mean(avg_rating),
+              n = n()) %>%
+    mutate(writer = fct_reorder(writer, avg_rating)) %>%
+    ggplot(aes(avg_rating, writer, size = n)) +
+    geom_point() +
+    labs(x = "IMDb rating",
+         y = "Writer", 
+         size = "Number of episodes",
+         title = "Jeffrey Lieber wrote the best LOST episode",
+         subtitle = "Point size displays number of episodes for feature characters")
+```
+
+<br />
+
+### Are better episodes related to more viewers?
+
+```{r}
+lost %>%
+    ggplot(aes(viewers, avg_rating)) +
+    geom_point() +
+    labs(x = "Views (millions)",
+         y = "IMDb rating") +
+    geom_smooth() +
+    labs(title = "More viewers does not mean better ratings")
+    
+```
+
+<br />
+
+### What are the most common words for each season of lost?
+
+```{r}
+library(tidytext)
+
+lost_words <- lost %>%
+    unnest_tokens(word, content)
+
+lost_words %>%
+    count(season, word, sort = TRUE) %>%
+    anti_join(stop_words) %>%
+    filter( ! word %in% c("lost", "episode", "episodes", "season")) %>%
+    group_by(season) %>%
+    slice_max(n, n = 15) %>%
+    ungroup() %>% 
+    mutate(word = reorder_within(word, n, season)) %>%
+    mutate(season = paste("Season", season)) %>%
+    ggplot(aes(n, word, fill = factor(season))) +
+    geom_col() +
+    facet_wrap(~season, scales = "free_y") +
+    scale_y_reordered() +
+    theme(legend.position = "none") +
+    labs(x = "Count",
+         y = "Word")
+
+```
+
+<br />
+
+### What are the most characteristic words for each season of lost?
+
+```{r}
+library(tidylo)
+
+lost_words %>%
+    count(season, word, sort = TRUE) %>%
+    bind_log_odds(season, word, n) %>%
+    group_by(season) %>%
+    slice_max(log_odds_weighted, n = 15) %>%
+    ungroup() %>% 
+    mutate(word = reorder_within(word, log_odds_weighted, season)) %>%
+    mutate(season = paste("Season", season)) %>%
+    ggplot(aes(log_odds_weighted, word, fill = factor(season))) +
+    geom_col() +
+    facet_wrap(~season, scales = "free_y") +
+    scale_y_reordered() +
+    theme(legend.position = "none") +
+    labs(x = "Count",
+         y = "Word")
+
+```
+
+<br />
+
+### Predict IMDb ratings of LOST episodes
+
+```{r}
+library(tidymodels)
+
+set.seed(12345)
+split <- initial_split(lost, strata = avg_rating)
+
+train <- training(split)
+test <- testing(split)
+
+folds <- vfold_cv(lost)
+```
+
+<br />
+
+### Check null regression model (e.g., predict the mean) to establish baseline error rate
+
+```{r}
+#basic recipe for null model
+base_rec <- train %>%
+    recipe(avg_rating ~ season + episode + director + content) 
+
+rec <- base_rec %>%
+    step_string2factor(director) %>%
+    step_unknown(director) %>%
+    step_other(director, threshold = tune()) %>%
+    step_dummy(director)
+
+library(textrecipes)
+
+text_rec <- rec %>%
+    step_tokenize(content) %>%
+    step_tokenfilter(content, max_tokens = tune()) %>%
+    step_tfidf(content)
+
+null_regression <- null_model() %>%
+  set_engine("parsnip") %>%
+  set_mode("regression")
+
+null_wf <- workflow() %>%
+    add_recipe(base_rec) %>%
+    add_model(null_regression)
+
+null_results <- tune_grid(
+  null_wf,
+  folds,
+  metrics = metric_set(rmse))
+
+null_results %>% collect_metrics()
+
+```
+
+The baseline error rate using RMSE using a null model is 0.437
+
+<br />
+
+### Build and train glmnet regression model
+
+```{r}
+glm_model <- linear_reg(penalty = tune(),
+                        mixture = tune()) %>%
+    set_engine("glmnet") %>%
+    set_mode("regression")
+
+glm_wf <- workflow() %>%
+    add_recipe(text_rec) %>%
+    add_model(glm_model)
+
+set.seed(54321)
+glm_grid <- glm_wf %>%
+    parameters() %>%
+    update(max_tokens = max_tokens(range = c(1, 2000))) %>%
+    grid_random(size = 50)
+
+glm_results <- tune_grid(
+    glm_wf,
+    folds,
+    metrics = metric_set(rmse), 
+    grid = glm_grid)
+
+glm_results %>% collect_metrics() %>% arrange(mean)
+glm_results %>% autoplot()
+```
+
+<br />
+
+### Build and train SVM regression model
+
+```{r}
+svm_model <- svm_rbf(cost = tune(),
+                     rbf_sigma = tune(),
+                     margin = tune()) %>%
+  set_engine("kernlab") %>%
+  set_mode("regression")
+
+svm_wf <- workflow() %>%
+    add_recipe(text_rec) %>%
+    add_model(svm_model)
+
+set.seed(54321)
+svm_grid <- svm_wf %>%
+    parameters() %>%
+    update(max_tokens = max_tokens(range = c(1, 2000))) %>%
+    grid_random(size = 50)
+
+svm_results <- tune_grid(
+  svm_wf,
+  folds,
+  metrics = metric_set(rmse), 
+  grid = svm_grid
+)
+
+svm_results %>% collect_metrics() %>% arrange(mean)
+
+```
+
+<br />
+
+### Train final glmnet regression model on all of training data using best parameters and evaluate on the test set
+
+```{r}
+glm_final <- glm_wf %>%
+    finalize_workflow(select_best(glm_results, metric = "rmse")) %>%
+    last_fit(split = split)
+
+glm_final %>% collect_metrics()
+```
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />

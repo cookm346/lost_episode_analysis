@@ -1,0 +1,120 @@
+season,episode,title,year,n_votes,avg_rating
+1,1,Pilot: Part 1,2004,"10,214",9.2
+1,2,Pilot: Part 2,2004,"7,793",9.1
+1,3,Tabula Rasa,2004,"6,152",8.5
+1,4,Walkabout,2004,"6,945",9.1
+1,5,White Rabbit,2004,"5,617",8.4
+1,6,House of the Rising Sun,2004,"5,473",8.2
+1,7,The Moth,2004,"5,506",8.5
+1,8,Confidence Man,2004,"5,593",8.7
+1,9,Solitary,2004,"5,261",8.5
+1,10,Raised by Another,2004,"5,346",8.7
+1,11,All the Best Cowboys Have Daddy Issues,2004,"5,383",8.8
+1,12,Whatever the Case May Be,2005,"5,102",8
+1,13,Hearts and Minds,2005,"5,071",8.2
+1,14,Special,2005,"4,945",8.2
+1,15,Homecoming,2005,"4,980",8.4
+1,16,Outlaws,2005,"5,086",8.6
+1,17,...In Translation,2005,"4,963",8.5
+1,18,Numbers,2005,"5,709",9.1
+1,19,Deus Ex Machina,2005,"5,603",9.1
+1,20,Do No Harm,2005,"5,415",8.9
+1,21,The Greater Good,2005,"4,771",8.3
+1,22,Born to Run,2005,"4,834",8.1
+1,23,Exodus: Part 1,2005,"5,665",9.1
+1,24,Exodus: Part 2 (Part I),2005,"6,323",9.3
+1,25,Exodus: Part 2 (Part II),2005,"3,065",9.3
+2,1,"Man of Science, Man of Faith",2005,"6,048",9.1
+2,2,Adrift,2005,"4,682",8.4
+2,3,Orientation,2005,"4,895",8.7
+2,4,Everybody Hates Hugo,2005,"4,711",8.3
+2,5,...And Found,2005,"4,553",7.9
+2,6,Abandoned,2005,"4,541",8.3
+2,7,The Other 48 Days,2005,"5,335",8.8
+2,8,Collision,2005,"4,613",8.7
+2,9,What Kate Did,2005,"4,543",8.3
+2,10,The 23rd Psalm,2006,"4,781",8.7
+2,11,The Hunting Party,2006,"4,456",8.5
+2,12,Fire + Water,2006,"4,548",7.3
+2,13,The Long Con,2006,"4,659",8.7
+2,14,One of Them,2006,"4,488",8.7
+2,15,Maternity Leave,2006,"4,478",8.4
+2,16,The Whole Truth,2006,"4,302",8.2
+2,17,Lockdown,2006,"4,966",9.1
+2,18,Dave,2006,"4,644",8.3
+2,19,S.O.S.,2006,"4,547",7.9
+2,20,Two for the Road,2006,"5,021",8.9
+2,21,?,2006,"4,760",8.8
+2,22,Three Minutes,2006,"4,485",8.5
+2,23,"Live Together, Die Alone",2006,"7,026",9.4
+3,1,A Tale of Two Cities,2006,"5,429",8.7
+3,2,The Glass Ballerina,2006,"4,552",8.1
+3,3,Further Instructions,2006,"4,492",8
+3,4,Every Man for Himself,2006,"4,548",8.4
+3,5,The Cost of Living,2006,"4,538",8.2
+3,6,I Do,2006,"4,797",8.6
+3,7,Not in Portland,2007,"4,783",8.7
+3,8,Flashes Before Your Eyes,2007,"5,883",9.1
+3,9,Stranger in a Strange Land,2007,"4,719",7.2
+3,10,Tricia Tanaka Is Dead,2007,"4,836",8.3
+3,11,Enter 77,2007,"4,681",8.6
+3,12,Par Avion,2007,"4,511",8.3
+3,13,The Man from Tallahassee,2007,"5,245",9.1
+3,14,Exposé,2007,"5,475",8.1
+3,15,Left Behind,2007,"4,425",8.2
+3,16,One of Us,2007,"4,597",8.7
+3,17,Catch-22,2007,"4,427",8.5
+3,18,D.O.C.,2007,"4,394",8.2
+3,19,The Brig,2007,"5,157",9.1
+3,20,The Man Behind the Curtain,2007,"5,802",9.2
+3,21,Greatest Hits,2007,"5,865",9.2
+3,22,Through the Looking Glass,2007,"10,998",9.7
+4,1,The Beginning of the End,2008,"5,868",8.8
+4,2,Confirmed Dead,2008,"4,880",8.7
+4,3,The Economist,2008,"4,574",8.5
+4,4,Eggtown,2008,"4,456",8.1
+4,5,The Constant,2008,"11,845",9.7
+4,6,The Other Woman,2008,"4,342",7.9
+4,7,Ji Yeon,2008,"4,455",8.4
+4,8,Meet Kevin Johnson,2008,"4,435",8.5
+4,9,The Shape of Things to Come,2008,"5,206",9
+4,10,Something Nice Back Home,2008,"4,218",8.1
+4,11,Cabin Fever,2008,"4,380",8.7
+4,12,There's No Place Like Home: Part 1,2008,"4,802",9
+4,13,There's No Place Like Home: Part 2,2008,"5,887",9.3
+4,14,There's No Place Like Home: Part 3,2008,"3,789",9.2
+5,1,Because You Left,2009,"5,131",8.7
+5,2,The Lie,2009,"4,345",8.3
+5,3,Jughead,2009,"4,421",8.6
+5,4,The Little Prince,2009,"4,170",8.3
+5,5,This Place Is Death,2009,"4,374",8.7
+5,6,316,2009,"4,295",8.6
+5,7,The Life and Death of Jeremy Bentham,2009,"4,732",8.8
+5,8,LaFleur,2009,"4,923",8.9
+5,9,Namaste,2009,"4,086",8.5
+5,10,He's Our You,2009,"4,051",8.5
+5,11,"Whatever Happened, Happened",2009,"4,061",8.3
+5,12,Dead Is Dead,2009,"4,326",8.8
+5,13,Some Like It Hoth,2009,"3,796",8.3
+5,14,The Variable,2009,"4,502",8.8
+5,15,Follow the Leader,2009,"4,139",8.7
+5,16,The Incident: Part 1,2009,"5,942",9.2
+5,17,The Incident: Part 2,2009,"3,819",9.2
+6,1,LA X - Part 1,2010,"5,026",8.7
+6,2,LA X - Part 2,2010,"3,057",8.5
+6,3,What Kate Does,2010,"4,288",7.7
+6,4,The Substitute,2010,"3,972",8.3
+6,5,Lighthouse,2010,"3,925",8.1
+6,6,Sundown,2010,"3,832",8.1
+6,7,Dr. Linus,2010,"3,988",8.5
+6,8,Recon,2010,"3,920",7.9
+6,9,Ab Aeterno,2010,"6,349",9.2
+6,10,The Package,2010,"3,848",7.9
+6,11,Happily Ever After,2010,"4,749",8.8
+6,12,Everybody Loves Hugo,2010,"3,957",8.5
+6,13,The Last Recruit,2010,"3,891",8.2
+6,14,The Candidate,2010,"5,031",8.9
+6,15,Across the Sea,2010,"5,155",8.2
+6,16,What They Died For,2010,"4,571",8.7
+6,17,The End,2010,"10,825",8.2
+6,18,The End Part 2,2010,139,9.4
